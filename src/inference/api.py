@@ -11,7 +11,8 @@ import torch
 import numpy as np
 from PIL import Image
 from fastapi import FastAPI, HTTPException, File, UploadFile
-from pydantic import BaseModel
+from contextlib import asynccontextmanager
+from pydantic import BaseModel, ConfigDict
 import yaml
 
 from src.models.cnn_model import create_model
@@ -23,6 +24,7 @@ logging.basicConfig(level=logging.INFO)
 # Request/Response models
 class HealthResponse(BaseModel):
     """Health check response."""
+    model_config = ConfigDict(protected_namespaces=())
     status: str
     model_loaded: bool
     version: str
@@ -112,13 +114,6 @@ class ModelInference:
         }
 
 
-# Initialize FastAPI app
-app = FastAPI(
-    title="Cats vs Dogs Classification API",
-    description="Binary image classification service for cat and dog images",
-    version="1.0.0"
-)
-
 # Global inference handler
 inference_handler: Optional[ModelInference] = None
 
@@ -127,14 +122,23 @@ request_count = 0
 prediction_count = 0
 
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """Initialize model on startup."""
     global inference_handler
-    
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     inference_handler = ModelInference(device=device)
     logger.info(f"Inference handler initialized on {device}")
+    yield
+
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="Cats vs Dogs Classification API",
+    description="Binary image classification service for cat and dog images",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 
 @app.get("/health", response_model=HealthResponse)

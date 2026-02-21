@@ -100,8 +100,10 @@ class DataPreprocessor:
         X_train, X_temp, y_train, y_temp = train_test_split(
             images, labels, test_size=0.2, random_state=self.seed, stratify=labels
         )
+        # Only stratify second split if enough samples per class exist
+        stratify_temp = y_temp if np.min(np.bincount(y_temp)) >= 2 else None
         X_val, X_test, y_val, y_test = train_test_split(
-            X_temp, y_temp, test_size=0.5, random_state=self.seed, stratify=y_temp
+            X_temp, y_temp, test_size=0.5, random_state=self.seed, stratify=stratify_temp
         )
         
         # Save splits

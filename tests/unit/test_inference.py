@@ -15,7 +15,8 @@ from src.inference.api import app, ModelInference
 @pytest.fixture
 def client():
     """Create test client."""
-    return TestClient(app)
+    with TestClient(app) as client:
+        yield client
 
 
 @pytest.fixture
