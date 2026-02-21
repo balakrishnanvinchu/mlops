@@ -1,0 +1,20 @@
+model:
+  epochs: 20
+  batch_size: 64
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  
+data:
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  image_size: 224
+  
+augmentation:
+  horizontal_flip: true
+  rotation: 20
+  zoom_range: 0.2
+  
+environment:
+  seed: 42
+  device: cuda
