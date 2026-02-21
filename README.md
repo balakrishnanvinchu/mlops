@@ -1,4 +1,4 @@
-# MLOps Assignment 2: Cats vs Dogs Binary Image Classification
+# MLOps : Cats vs Dogs Binary Image Classification
 
 ## Overview
 
